@@ -7,16 +7,89 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch CryptoGuard",
+            "name": "CryptoGuard",
             "program": "${workspaceFolder}/build/CryptoGuard",
             "args": [
-                "-i",
+                "--input",
+                "output.txt",
+                "--command",
+                "decrypt",
+                "--output",
+                "output_ddd.txt",
+                "--password",
+                "123"
+            ],
+            "cwd": "${workspaceFolder}/build"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Encrypt CryptoGuard",
+            "program": "${workspaceFolder}/build/CryptoGuard",
+            "args": [
+                "--input",
                 "input.txt",
                 "--command",
-                "checksum"
+                "encrypt",
+                "--output",
+                "output_encrypt.txt",
+                "--password",
+                "123"
+            ],
+            "cwd": "${workspaceFolder}/build"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Decrypt CryptoGuard",
+            "program": "${workspaceFolder}/build/CryptoGuard",
+            "args": [
+                "--input",
+                "output_encrypt.txt",
+                "--command",
+                "decrypt",
+                "--output",
+                "output_decrypt.txt",
+                "--password",
+                "123"
+            ],
+            "cwd": "${workspaceFolder}/build"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Checksum CryptoGuard",
+            "program": "${workspaceFolder}/build/CryptoGuard",
+            "args": [
+                "--input",
+                "input.txt",
+                "--command",
+                "checksum",
+                "--output",
+                "output_checksum.txt",
+                "--password",
+                "123"
+            ],
+            "cwd": "${workspaceFolder}/build"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Tests CryptoGuard",
+            "program": "${workspaceFolder}/build/CryptoGuard_tests",
+            "args": [
+                "--input",
+                "input.txt",
+                "--command",
+                "checkSuM",
+                "--output",
+                "output.txt",
+                "--password",
+                "123"
             ],
             "cwd": "${workspaceFolder}/build"
         }
+
 
     ]
 }

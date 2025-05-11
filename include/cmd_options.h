@@ -1,8 +1,10 @@
 #pragma once
 
 #include <boost/program_options.hpp>
+#include <istream>
 #include <string>
-#include <unordered_map>
+// #include <string_view>
+// #include <unordered_map>
 
 namespace CryptoGuard {
 
@@ -26,11 +28,12 @@ public:
 
 private:
   COMMAND_TYPE command_;
-  const std::unordered_map<std::string_view, COMMAND_TYPE> commandMapping_ = {
-      {"encrypt", ProgramOptions::COMMAND_TYPE::ENCRYPT},
-      {"decrypt", ProgramOptions::COMMAND_TYPE::DECRYPT},
-      {"checksum", ProgramOptions::COMMAND_TYPE::CHECKSUM},
-  };
+  // const std::unordered_map<std::string_view, COMMAND_TYPE> commandMapping_ =
+  // {
+  //     {"encrypt", ProgramOptions::COMMAND_TYPE::ENCRYPT},
+  //     {"decrypt", ProgramOptions::COMMAND_TYPE::DECRYPT},
+  //     {"checksum", ProgramOptions::COMMAND_TYPE::CHECKSUM},
+  // };
 
   std::string inputFile_;
   std::string outputFile_;
@@ -38,5 +41,8 @@ private:
 
   boost::program_options::options_description desc_;
 };
+
+std::istream &operator>>(std::istream &input,
+                         ProgramOptions::COMMAND_TYPE &command);
 
 } // namespace CryptoGuard
