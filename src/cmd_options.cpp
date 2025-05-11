@@ -8,4 +8,4 @@ ProgramOptions::~ProgramOptions() = default;
 
 bool ProgramOptions::Parse(int argc, char *argv[]) { return false; }
 
-}  // namespace CryptoGuard
+} // namespace CryptoGuard
