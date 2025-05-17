@@ -10,7 +10,10 @@ int main(int argc, char *argv[]) {
 
   try {
     CryptoGuard::ProgramOptions options;
-    options.Parse(argc, argv);
+
+    if (!options.Parse(argc, argv)) {
+      return 1;
+    }
 
     CryptoGuard::CryptoGuardCtx cryptoCtx;
 
@@ -37,8 +40,13 @@ int main(int argc, char *argv[]) {
       break;
 
     case COMMAND_TYPE::CHECKSUM:
-      output_file << cryptoCtx.CalculateChecksum(input_file);
-      std::print("Checksum saved in file: {}\n", options.GetOutputFile());
+      if (!options.GetOutputFile().empty()) {
+        output_file << cryptoCtx.CalculateChecksum(input_file);
+        std::print("Checksum saved in file: {}\n", options.GetOutputFile());
+      } else {
+        std::print("{0}\n", cryptoCtx.CalculateChecksum(input_file));
+      }
+
       break;
 
     default:

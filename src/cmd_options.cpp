@@ -4,8 +4,10 @@
 #include <boost/program_options/variables_map.hpp>
 #include <cctype>
 #include <exception>
+#include <format>
 #include <iostream>
 #include <print>
+#include <stdexcept>
 #include <string>
 
 namespace CryptoGuard {
@@ -19,9 +21,9 @@ ProgramOptions::ProgramOptions() : desc_("Allowed options") {
       "command - [encrypt], [decrypt] or [checksum]")(
       "input,i", po::value<std::string>(&inputFile_)->required(),
       "path to the input file")(
-      "output,o", po::value<std::string>(&outputFile_)->required(),
+      "output,o", po::value<std::string>(&outputFile_),
       "the path to the file where the result will be saved")(
-      "password,p", po::value<std::string>(&password_)->required(),
+      "password,p", po::value<std::string>(&password_),
       "password for encryption and decryption");
 }
 
@@ -38,7 +40,28 @@ bool ProgramOptions::Parse(int argc, char *argv[]) {
       desc_.print(std::cout);
       return false;
     }
+
     var_map.notify();
+
+    if (command_ == COMMAND_TYPE::DECRYPT ||
+        command_ == COMMAND_TYPE::ENCRYPT) {
+          
+          std::string error_message{};
+
+          if(inputFile_.empty()){
+            error_message += "the option '--input' is required but missing\n";
+          }
+
+          if(outputFile_.empty()){
+            error_message += "the option '--output' is required but missing\n";
+          }
+
+          if(!error_message.empty()){
+            throw std::runtime_error(error_message);
+          }
+
+    }
+
     return true;
 
   } catch (std::exception &e) {
