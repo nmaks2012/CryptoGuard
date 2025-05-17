@@ -35,7 +35,7 @@
 ### Команды для сборки проекта
 
 ```bash
-mkdir build ; cd build
+mkdir build && cd build
 
 # Вызывается один раз перед сборкой проекта, чтобы скачать и установить все необходимые зависимости
 conan install --settings=build_type=Debug --build=missing ..
