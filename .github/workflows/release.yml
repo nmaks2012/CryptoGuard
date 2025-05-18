@@ -7,17 +7,66 @@ on:
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
       # Update the package database and install required tools
-      - run: apt-get update
-      - run: apt-get install -y python3.12 python3-pip pipx git less vim sudo cmake make g++-14 clangd-19 libjemalloc-dev
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y python3.12 python3-pip pipx git less vim sudo cmake make g++-14 clangd-19 libjemalloc-dev
       # Update clangd and g++ versions to the latest ones
-      - run: ln -s  /usr/bin/clangd-19 /usr/bin/clangd
-      - run: ln -fs /usr/bin/g++-14 /usr/bin/g++
-      - run: pipx install conan
-      - run: pipx ensurepath
-      - run: cp ./default /root/.conan2/profiles/default 
+      - run: sudo ln -s  /usr/bin/clangd-19 /usr/bin/clangd
+      - run: sudo ln -fs /usr/bin/g++-14 /usr/bin/g++
+
+      - run: git config --global core.editor code
+      # Install conan through pipx
+      - run: sudo pipx install conan
+      - run: sudo pipx ensurepath
+      # Copy conan profile
+      - run: conan profile detect
+      - run: sudo cp ./.devcontainer/default ~/.conan2/profiles/default
+      - run: sudo chown -R runner:runner ${GITHUB_WORKSPACE}
+      - name: "Building"
+        run: |
+             conan install --settings=build_type=Release --build=missing .
+             conan build --settings=build_type=Release .
+      - name: "CLI tests"
+        working-directory: ./build
+        run: |
+             echo "Hello OpenSSL crypto world!" > input.txt
+             ./CryptoGuard -i input.txt     -o encrypted.txt -p 1234 --command encrypt
+             ./CryptoGuard -i encrypted.txt -o decrypted.txt -p 1234 --command decrypt
+             ./CryptoGuard -i input.txt     --command checksum
+             ./CryptoGuard -i decrypted.txt --command checksum
+      - name: "Google tests"
+        working-directory: ./build
+        run: cmake --build . --target test
+      - name: "Package"
+        working-directory: ./build
+        run: |
+              cmake . -DPATCH_VERSION=${{ github.run_number }}
+              cmake --build . --target package
+      - name: "Create Release"
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/CryptoGuard-1.0.${{ github.run_number }}-Linux.deb
+          asset_name: CryptoGuard-1.0.${{ github.run_number }}-Linux.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      
