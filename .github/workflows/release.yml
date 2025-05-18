@@ -1,0 +1,25 @@
+name: 'Crypto Guard release'
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    # Base image
+    # Date: 2025-01-27
+    runs-on: ubuntu@sha256:3afff29dffbc200d202546dc6c4f614edc3b109691e7ab4aa23d02b42ba86790
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      # Update the package database and install required tools
+      - run: apt-get update
+      - run: apt-get install -y python3.12 python3-pip pipx git less vim sudo cmake make g++-14 clangd-19 libjemalloc-dev
+      # Update clangd and g++ versions to the latest ones
+      - run: ln -s  /usr/bin/clangd-19 /usr/bin/clangd
+      - run: ln -fs /usr/bin/g++-14 /usr/bin/g++
+      - run: pipx install conan
+      - run: pipx ensurepath
+      - run: cp ./default /root/.conan2/profiles/default 
