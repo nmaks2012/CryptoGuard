@@ -14,9 +14,16 @@
 #include <string>
 #include <vector>
 
+// Макрос для обработки ошибок OpenSSL.
+// Использует буфер на стеке и ERR_error_string_n для безопасного получения
+// строки ошибки без динамических аллокаций, что предотвращает утечки памяти.
 #define ERROR_CRYPTO_GUARD_CTX(function_name)                                  \
-  throw std::runtime_error(std::format(                                        \
-      "{0}: {1}", #function_name, ERR_error_string(ERR_get_error(), nullptr)))
+  do {                                                                         \
+    char err_buf[256];                                                         \
+    ERR_error_string_n(ERR_get_error(), err_buf, sizeof(err_buf));             \
+    throw std::runtime_error(                                                  \
+        std::format("{0}: {1}", #function_name, err_buf));                      \
+  } while (0)
 
 namespace CryptoGuard {
 
